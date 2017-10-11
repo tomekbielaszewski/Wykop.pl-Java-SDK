@@ -20,10 +20,10 @@ public class CollectionsUtils {
 		return sb.toString();
 	}
 	
-	public static String join(Map<? extends Object, ? extends Object> map, String keyValueSeparator, String entrySeparator) {
+	public static String join(Map<?, ?> map, String keyValueSeparator, String entrySeparator) {
 		StringBuilder sb = new StringBuilder();
 		
-		for (Entry<? extends Object, ? extends Object> entry : map.entrySet()) {
+		for (Entry<?, ?> entry : map.entrySet()) {
 			sb.append(entry.getKey().toString());
 			sb.append(keyValueSeparator);
 			sb.append(entry.getValue().toString());

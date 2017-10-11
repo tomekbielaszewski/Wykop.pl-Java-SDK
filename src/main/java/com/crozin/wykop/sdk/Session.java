@@ -18,8 +18,6 @@ import java.util.Scanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.crozin.wykop.sdk.domain.Link;
-import com.crozin.wykop.sdk.domain.Profile;
 import com.crozin.wykop.sdk.exception.ApiException;
 import com.crozin.wykop.sdk.exception.ConnectionException;
 import com.crozin.wykop.sdk.exception.CredentialsException;
@@ -28,16 +26,9 @@ import com.crozin.wykop.sdk.exception.InvalidResourceException;
 import com.crozin.wykop.sdk.exception.InvalidResponseException;
 import com.crozin.wykop.sdk.exception.RequestException;
 import com.crozin.wykop.sdk.exception.SdkException;
-import com.crozin.wykop.sdk.repository.LinkRepository;
-import com.crozin.wykop.sdk.repository.LinksRepository;
-import com.crozin.wykop.sdk.repository.ObservatoryRepository;
-import com.crozin.wykop.sdk.repository.ProfileRepository;
-import com.crozin.wykop.sdk.repository.ProfilesRepository;
-import com.crozin.wykop.sdk.service.SearchService;
 import com.crozin.wykop.sdk.util.CollectionsUtils;
 import com.crozin.wykop.sdk.util.HashUtils;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 
 public class Session {
@@ -48,17 +39,11 @@ public class Session {
 	protected Application sdk;
 	protected Map<String, String> apiParameters = new HashMap<String, String>();
 	
-	protected Map<Class<?>, String> domainToResource = new HashMap<Class<?>, String>();
-	
 	Session(Application app) {
 		this.sdk = app;
 		
 		apiParameters.put("appkey", app.publicKey);
 		apiParameters.put("format", "json");
-		
-		domainToResource.put(Link.class, "link");
-		domainToResource.put(Profile.class, "profile");
-		domainToResource.put(Entry.class, "entry");
 	}
 	
 	public Map<String, String> getMapResult(Command cmd) {
@@ -90,16 +75,6 @@ public class Session {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-	}
-	
-	public <T> T find(Integer id, Class<T> type) {
-		String resource = domainToResource.get(type);
-		
-		if (resource == null) {
-			throw new IllegalArgumentException("Unknow domain type");
-		}
-		
-		return getSingleResult(new Command(resource, "index", id.toString()), type);
 	}
 	
 	public String execute(Command cmd) {
@@ -248,41 +223,5 @@ public class Session {
 		}
 		
 		return postData.toString();
-	}
-	
-	public LinkRepository getLinkRepository(Link link) {
-		return new LinkRepository(this, link.getId());
-	}
-	
-	public LinkRepository getLinkRepository(Integer id) {
-		return new LinkRepository(this, id);
-	}
-	
-	public LinksRepository getLinksRepository() {
-		return new LinksRepository(this);
-	}
-	
-	public ProfileRepository getProfileRepository(Profile profile) {
-		return new ProfileRepository(this, profile.getUsername());
-	}
-	
-	public ProfileRepository getProfileRepository(String username) {
-		return new ProfileRepository(this, username);
-	}
-	
-	public ProfilesRepository getProfilesRepository() {
-		return new ProfilesRepository(this);
-	}
-	
-	public ObservatoryRepository getObservatoryRepository() {
-		return new ObservatoryRepository(this);
-	}
-	
-	public SearchService getSearchService() {
-		return new SearchService(this);
-	}
-	
-	public ObjectMapper getObjectMapper() {
-		return sdk.om;
 	}
 }
